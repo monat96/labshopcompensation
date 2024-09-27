@@ -1,59 +1,112 @@
 package labshopcompensation.domain;
 
-import java.util.Date;
-import java.util.List;
-import javax.persistence.*;
-import labshopcompensation.OrderApplication;
-import labshopcompensation.domain.OrderCancelled;
 import labshopcompensation.domain.OrderPlaced;
+import labshopcompensation.domain.OrderCancelled;
+import labshopcompensation.OrderApplication;
+import javax.persistence.*;
+import java.util.List;
 import lombok.Data;
+import java.util.Date;
+import java.time.LocalDate;
+
 
 @Entity
-@Table(name = "Order_table")
+@Table(name="Order_table")
 @Data
-public class Order {
 
+//<<< DDD / Aggregate Root
+public class Order  {
+
+
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    
+    
+    
+    
     private Long id;
-
+    
+    
+    
+    
     private String productId;
-
+    
+    
+    
+    
     private Integer qty;
-
+    
+    
+    
+    
     private String customerId;
-
+    
+    
+    
+    
     private Double amount;
-
+    
+    
+    
+    
     private String status;
-
+    
+    
+    
+    
     private String address;
 
     @PostPersist
-    public void onPostPersist() {
+    public void onPostPersist(){
+
+
         OrderPlaced orderPlaced = new OrderPlaced(this);
         orderPlaced.publishAfterCommit();
-    }
 
+    
+    }
     @PrePersist
-    public void onPrePersist() {
-        // Get request from Inventory
-        //labshopcompensation.external.Inventory inventory =
-        //    Application.applicationContext.getBean(labshopcompensation.external.InventoryService.class)
-        //    .getInventory(/** mapping value needed */);
-
+    public void onPrePersist(){
+    
     }
-
     @PreRemove
-    public void onPreRemove() {
+    public void onPreRemove(){
+
+
         OrderCancelled orderCancelled = new OrderCancelled(this);
         orderCancelled.publishAfterCommit();
+
+    
     }
 
-    public static OrderRepository repository() {
-        OrderRepository orderRepository = OrderApplication.applicationContext.getBean(
-            OrderRepository.class
-        );
+    public static OrderRepository repository(){
+        OrderRepository orderRepository = OrderApplication.applicationContext.getBean(OrderRepository.class);
         return orderRepository;
     }
+
+
+
+    public void order(){
+        //implement business logic here:
+        
+        OrderPlaced orderPlaced = new OrderPlaced(this);
+        orderPlaced.publishAfterCommit();
+        
+        
+        labshopcompensation.external.InventoryQuery inventoryQuery = new labshopcompensation.external.InventoryQuery();
+        OrderApplication.applicationContext
+            .getBean(labshopcompensation.external.Service.class)
+            .( inventoryQuery);
+    }
+    public void cancel(){
+        //implement business logic here:
+        
+        
+        
+    }
+
+
+
 }
+//>>> DDD / Aggregate Root

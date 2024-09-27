@@ -12,6 +12,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.MimeTypeUtils;
 
+//<<< Clean Arch / Outbound Adaptor
 public class AbstractEvent {
 
     String eventType;
@@ -78,6 +79,18 @@ public class AbstractEvent {
     public boolean validate() {
         return getEventType().equals(getClass().getSimpleName());
     }
-    // keep
 
+    public String toJson() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = null;
+
+        try {
+            json = objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON format exception", e);
+        }
+
+        return json;
+    }
 }
+//>>> Clean Arch / Outbound Adaptor
